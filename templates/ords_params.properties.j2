@@ -1,0 +1,17 @@
+db.hostname="{{ apex_db_host }}"
+db.password="{{ apex_public_user_password }}"
+db.port="{{ apex_db_port }}"
+db.servicename="{{ apex_db_service_name }}"
+db.username="{{ apex_public_user }}"
+plsql.gateway.add=true
+rest.services.apex.add=true
+rest.services.ords.add=true
+schema.tablespace.default=SYSAUX
+schema.tablespace.temp=TEMP
+user.apex.listener.password="{{ apex_listener_user_password }}"
+user.apex.restpublic.password="{{ apex_rest_public_user_password }}"
+user.public.password="{{ apex_public_user_password }}"
+user.tablespace.default=SYSAUX
+user.tablespace.temp=TEMP
+sys.user=sys
+sys.password="{{ apex_sys_user_password }}"
