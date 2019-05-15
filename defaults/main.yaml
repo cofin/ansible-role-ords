@@ -1,0 +1,15 @@
+---
+# Default
+ords_install_files: apache-tomcat-9.0.19.tar.gz
+ords_tmp_install_dir: /tmp/ansible-ords-install
+ords_user: oracle
+ords_group: oinstall
+ords_uid: 1001
+ords_gid: 1001
+ords_home_dir: /home/oracle
+ords_base_dir: /opt/ords/
+ords_yum_packages:
+  - java-1.8.0-openjdk-devel
+  - java-1.8.0-openjdk
+tomcat_deploy: true
+catalina_home: /opt/tomcat

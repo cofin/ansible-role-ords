@@ -1,0 +1,64 @@
+---
+# This role installs a specific version of tomcat to OEL servers
+- name: Creating ORDS Group
+  group: name="{{ ords_group }}"
+    state=present
+
+- name: Creating ORDS user
+  user: name="{{ ords_user }}"
+    group="{{ ords_group }}"
+    uid="{{ ords_uid }}"
+    state=present
+    shell="/bin/bash"
+    home="{{ ords_home_dir }}"
+
+- name: Installing dependencies
+  yum: name="{{ ords_yum_packages }}"
+    state=present
+  when: ansible_os_family == 'RedHat'
+
+- name: creating base directory
+  file: path="{{ ords_base_dir }}"
+    state=directory
+    owner="{{ ords_user }}"
+    group="{{ ords_group }}"
+
+- name: creating temporary directory
+  file: path="{{ ords_tmp_install_dir }}"
+    state=directory
+    owner="{{ ords_user }}"
+    group="{{ ords_group }}"
+
+- name: Check for an existing installation of ORDS
+  stat:
+    path: "{{ ords_base_dir }}/ords.war"
+  register: existing_ords_install
+
+- name: Check for ORDS installation files
+  local_action: stat path="{{ role_path }}/files/{{ ords_install_files }}"
+  become: false
+  register: ords_installer_exists
+  when: existing_ords_install.stat.exists == False
+
+- name: ORDS installation files are missing
+  fail: msg="Installation files requred for ORDS are missing.  File '{{ ords_install_files }}' not found at '{{ role_path }}/files/'"
+  when: ords_installer_exists.stat.exists == False
+
+- name: Uploading ORDS Installation Files
+  unarchive:
+    src: "files/{{ ords_install_files }}"
+    dest: "{{ ords_tmp_install_dir }}"
+  when: existing_ords_install.stat.exists == False
+
+- name: Create installation properties file into place.
+  template:
+    src: "{{ role_path }}/templates/ords_params.properties.j2"
+    dest: "{{ ords_tmp_install_dir }}/ords_params.properties"
+    owner: {{ ords_user }}
+    group: {{ ords_group }}
+    mode: 0770
+
+- name: Execute ORDS Installation
+  shell: "chkconfig --add tomcat && chkconfig --level 2345 tomcat on"
+  become: yes
+  become_user: root
